@@ -1,6 +1,7 @@
 import app from "./app.js";
+import { envConfig } from "./config/config.js";
 
-app.listen(4000, () => {
-    console.log('Server is running on port 4000');
+app.listen(envConfig.port, () => {
+    console.log(`Server is running on port ${envConfig.port}`);
 
 })
