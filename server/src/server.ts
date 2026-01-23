@@ -11,17 +11,11 @@ app.get("/", (req, res) => {
 })
 
 
-try {
-    sequelize.authenticate();
-    console.log("Database connected successfully");
-    app.listen(envConfig.port, () => {
-        console.log(`Server is running on port ${envConfig.port}`);
 
-    })
+app.listen(envConfig.port, () => {
+    console.log(`Server is running on port ${envConfig.port}`);
 
-} catch (error) {
-    console.log("Unable to connect to the database:", error);
-}
+})
 
 
 
