@@ -4,35 +4,59 @@ import EncryptDecryptPassHandler from "../handler/authController.js";
 
 class UserController {
     static async register(req: Request, res: Response) {
-        const { username, email, password } = req.body
-        if (!username || !email || !password) {
-            res.status(400).json({
-                message: "username, email and password are required!!!!"
-            })
-        }
+        try {
 
-        //check if user already exists or not
-
-        const [data] = await User.findAll({
-            where: {
-                email: email
+            const { username, email, password } = req.body
+            if (!username || !email || !password) {
+                return res.status(400).json({
+                    message: "username, email and password are required!!!!"
+                })
             }
-        })
 
+            //check if user already exists or not
 
-        if (data) {
-            return res.status(400).json({
-                message: "user with the given email already exists  !!!!    "
+            const data = await User.findOne({
+                where: {
+                    email: email
+                }
             })
+
+
+            if (data) {
+                return res.status(400).json({
+                    message: "user with the given email already exists  !!!!    "
+                })
+            }
+
+            const hashedPassword = await EncryptDecryptPassHandler.hashPassword(password)
+
+            const user = await User.create({
+                email,
+                password: hashedPassword,
+                username
+            })
+
+
+            if (user) {
+                res.status(201).json({
+                    message: "user registered successfully!!!!"
+                })
+            }
+
+            return res.status(500).json({
+                message: " something went wrong!!!! please try again later  "
+            })
+        } catch (error) {
+            return res.status(500).json({
+                message: "internal server error",
+                error: error
+            })
+
         }
-
-        const hashedPassword = await EncryptDecryptPassHandler.hashPassword(password)
-
-        const user = await User.create({
-            email,
-            password: hashedPassword,
-            username
-        })
 
     }
 }
+
+
+
+export default UserController;
