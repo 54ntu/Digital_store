@@ -16,4 +16,8 @@ try {
   console.log("Unable to connect to the database:", error);
 }
 
+sequelize.sync({ force: false, alter: false }).then(() => {    //this will create the table if it doesn't exist (and do nothing if it already exists)
+  console.log("all models synced successfully");
+})
+
 export { sequelize };
