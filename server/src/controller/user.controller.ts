@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import User from "../models/user.model.js";
 import EncryptDecryptPassHandler from "../handler/authController.js";
+import { Op } from "sequelize";
 
 class UserController {
     static async register(req: Request, res: Response) {
@@ -54,6 +55,36 @@ class UserController {
 
         }
 
+    }
+
+
+    static async login(req: Request, res: Response) {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "email or password is required!!!!!"
+            })
+        }
+
+        //if email or username and password is given then check for user exist or not
+        const [user] = await User.findAll({
+            where: {
+
+                email: email
+
+            }
+        })
+
+        // console.log("user : ", user)
+        if (!user) {
+            return res.status(404).json({
+                message: "user with the given email does not exist!!!!!!"
+            })
+        }
+
+        const isPasswordMatched = await EncryptDecryptPassHandler.comparePassword(password, user.password );
+        console.log(isPasswordMatched)
     }
 }
 
