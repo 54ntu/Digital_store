@@ -107,7 +107,7 @@ class UserController {
                     expiresIn: envConfig.accessTokenExpiry as string
 
                 }
-            );
+            )
 
             // console.log("accessToken : ", accessToken)
 
@@ -136,8 +136,26 @@ class UserController {
 
 
     static async logout(req: Request, res: Response) {
-        console.log(req)
+        try {
+            const options = {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict' as const,
+            }
 
+            return res.status(200)
+                .clearCookie('accessToken', options)
+                .json({
+                    message: "user logged out successfully!!!!!"
+                })
+
+        } catch (error) {
+            return res.status(500).json({
+                message: "internal server error",
+                error: error
+            })
+
+        }
     }
 
 
