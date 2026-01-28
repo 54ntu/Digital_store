@@ -1,13 +1,21 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript"
 import { envConfig } from "../config/config.js";
+import User from "../models/user.model.js";
 
-const sequelize = new Sequelize(
-  envConfig.postgresUri as string,
+// const sequelize = new Sequelize(
+//   envConfig.postgresUri as string,
 
-  {
-    dialect: "postgres",
-  },
-);
+//   {
+//     dialect: "postgres",
+//   },
+// );
+
+
+const sequelize = new Sequelize(envConfig.postgresUri as string, {
+  models: [User]    //this will automatically import all models defined in the models folder
+})
+
+
 try {
   sequelize.authenticate().then(() => {
     console.log("Database connected successfully");

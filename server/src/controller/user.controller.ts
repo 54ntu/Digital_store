@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import User from "../models/user.model.js";
 import EncryptDecryptPassHandler from "../handler/authController.js";
-import { Op } from "sequelize";
 
 class UserController {
     static async register(req: Request, res: Response) {
@@ -83,7 +82,7 @@ class UserController {
             })
         }
 
-        const isPasswordMatched = await EncryptDecryptPassHandler.comparePassword(password, user.password );
+        const isPasswordMatched = await EncryptDecryptPassHandler.comparePassword(password, user.password);
         console.log(isPasswordMatched)
     }
 }
