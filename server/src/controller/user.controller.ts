@@ -1,6 +1,8 @@
 import type { Request, Response } from "express";
 import User from "../models/user.model.js";
 import EncryptDecryptPassHandler from "../handler/authController.js";
+import jwt from "jsonwebtoken";
+import { envConfig } from "../config/config.js";
 
 class UserController {
     static async register(req: Request, res: Response) {
@@ -57,34 +59,81 @@ class UserController {
     }
 
 
-    static async login(req: Request, res: Response) {
-        const { email, password } = req.body;
+    static async login(req: Request, res: Response) {   
+        try {
+            const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({
-                message: "email or password is required!!!!!"
+            if (!email || !password) {
+                return res.status(400).json({
+                    message: "email or password is required!!!!!"
+                })
+            }
+
+            //if email or username and password is given then check for user exist or not
+            const [user] = await User.findAll({
+                where: {
+
+                    email: email
+
+                }
             })
-        }
 
-        //if email or username and password is given then check for user exist or not
-        const [user] = await User.findAll({
-            where: {
+            // console.log("user : ", user)
+            if (!user) {
+                return res.status(404).json({
+                    message: "user with the given email does not exist!!!!!!"
+                })
+            }
 
-                email: email
+            const isPasswordMatched = await EncryptDecryptPassHandler.comparePassword(password, user.password);
+            // console.log(isPasswordMatched)
+
+            if (!isPasswordMatched) {
+                return res.status(401).json({
+                    message: "invalid credentials!!!!!"
+                })
 
             }
-        })
 
-        // console.log("user : ", user)
-        if (!user) {
-            return res.status(404).json({
-                message: "user with the given email does not exist!!!!!!"
+            const accessToken = jwt.sign(
+                {
+                    id: user.id,
+                    email: user.email,
+                    role: user.role
+                },
+
+                envConfig.accessTokenSecret as string,
+                {
+                    expiresIn: envConfig.accessTokenExpiry as number
+
+                }
+            );
+
+            // console.log("accessToken : ", accessToken)
+
+            //before we set token into the cookie we have to set some options
+            const cookieOptions = {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict' as const
+            }
+
+
+            return res.status(200)
+                .cookie('accessToken', accessToken, cookieOptions)
+                .json({
+                    message: "user logged in successfully!!!!!",
+                    accessToken: accessToken
+                })
+        } catch (error) {
+            return res.status(500).json({
+                message: "internal server error",
+                error: error
             })
-        }
 
-        const isPasswordMatched = await EncryptDecryptPassHandler.comparePassword(password, user.password);
-        console.log(isPasswordMatched)
+        }
     }
+
 }
 
 
