@@ -59,7 +59,7 @@ class UserController {
     }
 
 
-    static async login(req: Request, res: Response) {   
+    static async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body;
 
@@ -104,7 +104,7 @@ class UserController {
 
                 envConfig.accessTokenSecret as string,
                 {
-                    expiresIn: envConfig.accessTokenExpiry as number
+                    expiresIn: envConfig.accessTokenExpiry as string
 
                 }
             );
@@ -133,6 +133,13 @@ class UserController {
 
         }
     }
+
+
+    static async logout(req: Request, res: Response) {
+        console.log(req)
+
+    }
+
 
 }
 
