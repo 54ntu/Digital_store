@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import EncryptDecryptPassHandler from "../handler/authController.js";
 import jwt from "jsonwebtoken";
 import { envConfig } from "../config/config.js";
+import generateOtp from "../handler/generateOtp.js";
 
 class UserController {
     static async register(req: Request, res: Response) {
@@ -156,6 +157,32 @@ class UserController {
             })
 
         }
+    }
+
+    static async forgotPassword(req: Request, res: Response) {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                message: "email is required!!!!!"
+            })
+        }
+
+        const user = await User.findAll({
+            where: {
+                email: email
+            }
+        })
+
+        if (user.length === 0) {
+            return res.status(404).json({
+                message: "user with the given email does not exist!!!!!!"
+            })
+        }
+
+        const otp = generateOtp()
+        console.log(`OTP for ${email} is ${otp}`);
+
     }
 
 
