@@ -102,9 +102,9 @@ class UserController {
                     role: user.role
                 },
 
-                envConfig.accessTokenSecret as string,
+                envConfig.accessTokenSecret,
                 {
-                    expiresIn: envConfig.accessTokenExpiry as string
+                    expiresIn: envConfig.accessTokenExpiry
 
                 }
             )
