@@ -4,6 +4,7 @@ import EncryptDecryptPassHandler from "../handler/authController.js";
 import jwt from "jsonwebtoken";
 import { envConfig } from "../config/config.js";
 import generateOtp from "../handler/generateOtp.js";
+import sendMail from "../handler/sendMail.js";
 
 class UserController {
     static async register(req: Request, res: Response) {
@@ -162,26 +163,49 @@ class UserController {
     static async forgotPassword(req: Request, res: Response) {
         const { email } = req.body;
 
-        if (!email) {
-            return res.status(400).json({
-                message: "email is required!!!!!"
-            })
-        }
-
-        const user = await User.findAll({
-            where: {
-                email: email
+        try {
+            if (!email) {
+                return res.status(400).json({
+                    message: "email is required!!!!!"
+                })
             }
-        })
 
-        if (user.length === 0) {
-            return res.status(404).json({
-                message: "user with the given email does not exist!!!!!!"
+            const user = await User.findOne({
+                where: {
+                    email: email
+                }
             })
+
+            if (!user) {
+                return res.status(404).json({
+                    message: "user with the given email does not exist!!!!!!"
+                })
+            }
+
+            const otp = generateOtp()
+            // console.log(`OTP for ${email} is ${otp}`);
+
+            await sendMail({
+                to: email,
+                subject: "Password Reset OTP - Digital Dokan",
+                text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes. If you did not request a password reset, please ignore this email.`
+            })
+
+            user.otp = otp.toString();
+            user.otpGeneratedTime = Date.now().toString();
+            await user.save();
+
+            return res.status(200).json({
+                message: "OTP has been sent to your email address!!!!!"
+            })
+        } catch (error) {
+            return res.status(500).json({
+                message: "internal server error",
+                error: error
+            })
+
         }
 
-        const otp = generateOtp()
-        console.log(`OTP for ${email} is ${otp}`);
 
     }
 
