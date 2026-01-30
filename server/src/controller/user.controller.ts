@@ -47,6 +47,12 @@ class UserController {
                 })
             }
 
+            await sendMail({
+                to: email,
+                subject: "Welcome to Digital Dokan!",
+                text: `Congralution ${username}, you have been successfully registered on Digital Dokan. We are excited to have you on board!`
+            })
+
             return res.status(500).json({
                 message: " something went wrong!!!! please try again later  "
             })
@@ -207,6 +213,11 @@ class UserController {
         }
 
 
+    }
+
+
+    static async resetPassword(req:Request,res:Response){
+            
     }
 
 
