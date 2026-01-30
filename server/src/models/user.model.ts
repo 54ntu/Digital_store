@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript"
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript"
+import PasswordResetSession from "./passwordResetSession.model.js";
 
 @Table({
     tableName: "users",
@@ -13,6 +14,10 @@ class User extends Model {
         defaultValue: DataType.UUIDV4
     })
     declare id: string;
+
+
+    @HasMany(() => PasswordResetSession)
+    declare passwordResetSessions: PasswordResetSession[];
 
 
     @Column({
@@ -36,15 +41,6 @@ class User extends Model {
     })
     declare role: string
 
-    @Column({
-        type: DataType.STRING
-    })
-    declare otp: string
-
-    @Column({
-        type: DataType.STRING
-    })
-    declare otpGeneratedTime: string
 
 
 

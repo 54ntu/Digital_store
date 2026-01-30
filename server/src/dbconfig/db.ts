@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize-typescript"
 import { envConfig } from "../config/config.js";
 import User from "../models/user.model.js";
+import PasswordResetSession from "../models/passwordResetSession.model.js";
 
 // const sequelize = new Sequelize(
 //   envConfig.postgresUri as string,
@@ -12,7 +13,7 @@ import User from "../models/user.model.js";
 
 
 const sequelize = new Sequelize(envConfig.postgresUri as string, {
-  models: [User]    //this will automatically import all models defined in the models folder
+  models: [User, PasswordResetSession]    //this will automatically import all models defined in the models folder
 })
 
 
