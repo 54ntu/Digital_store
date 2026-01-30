@@ -2,9 +2,12 @@ import type { Request, Response } from "express";
 import User from "../models/user.model.js";
 import EncryptDecryptPassHandler from "../handler/authController.js";
 import jwt from "jsonwebtoken";
+import { v4 as uuid4 } from 'uuid'
 import { envConfig } from "../config/config.js";
 import generateOtp from "../handler/generateOtp.js";
 import sendMail from "../handler/sendMail.js";
+import PasswordResetSession from "../models/passwordResetSession.model.js";
+import { hashValue } from "../handler/otpHash.js";
 
 class UserController {
     static async register(req: Request, res: Response) {
@@ -189,7 +192,15 @@ class UserController {
             }
 
             const otp = generateOtp()
-            // console.log(`OTP for ${email} is ${otp}`);
+            const resetSessionId = uuid4();
+
+            await PasswordResetSession.create({
+                id: resetSessionId,
+                userId: user.id,
+                otpHash: hashValue(otp.toString()),
+                expiresAt: Date.now() + 10 * 60 * 1000 //10 minutes
+            })
+
 
             await sendMail({
                 to: email,
@@ -197,12 +208,11 @@ class UserController {
                 text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes. If you did not request a password reset, please ignore this email.`
             })
 
-            user.otp = otp.toString();
-            user.otpGeneratedTime = Date.now().toString();
-            await user.save();
+
 
             return res.status(200).json({
-                message: "OTP has been sent to your email address!!!!!"
+                message: "OTP has been sent to your email address!!!!!",
+                resetSessionId: resetSessionId
             })
         } catch (error) {
             return res.status(500).json({
@@ -216,8 +226,8 @@ class UserController {
     }
 
 
-    static async resetPassword(req:Request,res:Response){
-            
+    static async resetPassword(req: Request, res: Response) {
+
     }
 
 

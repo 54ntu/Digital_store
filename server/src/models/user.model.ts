@@ -41,9 +41,6 @@ class User extends Model {
     })
     declare role: string
 
-
-
-
 }
 
 export default User;
