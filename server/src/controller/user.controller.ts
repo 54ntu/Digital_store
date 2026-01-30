@@ -226,8 +226,75 @@ class UserController {
     }
 
 
-    static async resetPassword(req: Request, res: Response) {
 
+    static async verifyOtp(req: Request, res: Response) {
+        const { otp, resetSessionId } = req.body;
+        try {
+            const session = await PasswordResetSession.findOne({
+                where: {
+                    id: resetSessionId
+                }
+            })
+
+            if (!session || session.expiresAt < Date.now()) {
+                return res.status(400).json({
+                    message: "OTP expired or invalid!!!!!"
+                })
+            }
+
+            if (session.attempts >= 5) {
+                return res.status(429).json({
+                    message: "Too many attempts."
+                })
+            }
+
+            if (hashValue(otp) !== session.otpHash) {
+                session.attempts += 1;
+                await session.save();
+                return res.status(400).json({
+                    message: "Invalid OTP!!!!!"
+                })
+            }
+
+            session.verified = true;
+            await session.save();
+            return res.status(200).json({
+                message: "OTP verified successfully!!!!!"
+            })
+        } catch (error) {
+            return res.status(500).json({
+                message: "internal server error",
+                error: error
+            })
+
+        }
+
+    }
+
+    static async resetPassword(req: Request, res: Response) {
+        const { newPassword, confirmPassword, resetSessionId } = req.body;
+        const session = await PasswordResetSession.findOne({
+            where: {
+                id: resetSessionId,
+                verified: true
+            },
+            include: User
+
+        })
+
+        if (!session) {
+            return res.status(400).json({
+                message: "Invalid or unverified password reset session."
+            })
+        }
+
+        session.user.password = await EncryptDecryptPassHandler.hashPassword(newPassword);
+        await session.user.save();
+        await session.destroy();
+
+        return res.status(200).json({
+            message: "Password has been reset successfully."
+        })
     }
 
 
