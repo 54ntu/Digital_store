@@ -21,7 +21,7 @@ const sequelize = new Sequelize(envConfig.postgresUri as string, {
 
 
 
-sequelize.sync({ force: false, alter: false }).then(() => {    //this will create the table if it doesn't exist (and do nothing if it already exists)
+sequelize.sync({ force: false, alter: true }).then(() => {    //this will create the table if it doesn't exist (and do nothing if it already exists)
   console.log("all models synced successfully");
 })
 
