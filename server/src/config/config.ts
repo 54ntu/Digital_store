@@ -6,6 +6,9 @@ interface EnvConfig {
     accessTokenExpiry: string;
     useremail: string;
     useremailpassword: string;
+    adminemail: string;
+    adminpassword: string;
+    adminusername: string;
 }
 
 
@@ -15,5 +18,8 @@ export const envConfig: EnvConfig = {
     accessTokenSecret: process.env.ACCESS_TOKEN_SECRET!,
     accessTokenExpiry: process.env.ACCESS_TOKEN_EXPIRY!,
     useremail: process.env.USER_EMAIL!,
-    useremailpassword: process.env.USER_EMAIL_PASSWORD!
+    useremailpassword: process.env.USER_EMAIL_PASSWORD!,
+    adminemail: process.env.ADMIN_EMAIL!,
+    adminpassword: process.env.ADMIN_PASSWORD!,
+    adminusername: process.env.ADMIN_USERNAME!,
 }
