@@ -66,6 +66,58 @@ class CategoryController {
         }
     }
 
+    static async updateCategory(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+            const { categoryName } = req.body;
+            if (!id || !categoryName) {
+                res.status(400).json({
+                    message: "category id and name are required!!!!"
+                })
+                return;
+            }
+
+            //check whether the category of given id exists or not
+            const existingCategory = await Category.findAll({
+                where: {
+                    id: id
+                }
+            })
+
+            if (existingCategory.length === 0) {
+                res.status(404).json({
+                    message: "Category not found"
+                })
+                return;
+            }
+
+            //if found then update the existing category
+            const updatedCategory = await Category.update({
+                categoryName: categoryName
+
+            }, {
+                where: {
+                    id: id
+                }
+            })
+
+
+            res.status(200).json({
+                message: "category updated successfully",
+                updatedCategory: updatedCategory
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "internal server error",
+                error: error
+            })
+            return;
+
+        }
+
+
+    }
+
 
 }
 
