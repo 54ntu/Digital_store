@@ -8,7 +8,7 @@ class ProductController {
         const { productName, description, price, productStock, discount, categoryID } = req.body;
 
         //image url will be handled separately
-        const productImageUrl = req.file?.filename;
+        const productImageUrl = req.file ?.filename;
         console.log(req.file)
     }
 

@@ -16,59 +16,74 @@ interface IextededRequest extends Request {
     user?: JwtPayload;
 }
 
-const verifyToken = async (req: IextededRequest, res: Response, next: NextFunction): Promise<void> => {
 
-    try {
-        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-        console.log(`token from cookies : ${token}`)
-        if (!token) {
-            res.status(401).json({
-                message: "access denied, unauthorized user!!!!!  "
+class UserMiddleware {
+    static async isUserLoggedIn(req: IextededRequest, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+            if (!token) {
+                res.status(401).json({
+                    message: "access denied, unauthorized user!!!!!"
+                })
+            }
+
+            const decodedToken = jwt.verify(token as string, envConfig.accessTokenSecret as string) as JwtPayload;
+            if (!decodedToken) {
+                res.status(401).json({
+                    message: "invalid token 🤬🤬🤬🤬"
+                })
+            }
+
+            const userData = await User.findByPk(decodedToken.id);
+
+            if (!userData) {
+                res.status(404).json({
+                    message: "User not found 😢😢😢😢"
+                })
+                return;
+            }
+
+            req.user = {
+                id: userData.id,
+                email: userData.email,
+                role: userData.role
+            }
+
+            next();
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal server error",
+                error: error
             })
-            return;
         }
 
-        // console.log("token : ", token)
 
-        const decodedToken = jwt.verify(token, envConfig.accessTokenSecret as string) as JwtPayload;
-
-        // console.log("decodedToken : ", decodedToken)
-
-        if (!decodedToken) {
-            res.status(401).json({
-                message: "invalid token!!!!!"
-            })
-            return;
-        }
-        //attach the user info to the req object
-
-        const userdata = await User.findByPk(decodedToken.id);
-
-        // console.log("user from verifyToken middleware : ", user?.username)
-
-        if (!userdata) {
-            res.status(404).json({
-                message: "user not found!!!!!!"
-            })
-            return;
-        }
-
-        req.user = {
-            id: userdata.id,
-            email: userdata.email,
-            role: userdata.role
-        }; //attach user info to req object
-
-        next();
-
-    } catch (error) {
-        res.status(500).json({
-            message: "internal server error",
-            error: error
-        })
-        return;
 
     }
-}
 
-export default verifyToken;
+    static async isAdmin(req: IextededRequest, res: Response, next: NextFunction): Promise<void> {
+
+        try {
+            if (!req.user) {
+                res.status(401).json({
+                    message: "Unauthorized user, please login first 😢😢😢😢"
+                })
+            }
+
+            if (req.user?.role !== "admin") {
+                res.status(403).json({
+                    message: "Forbidden, you don't have permission to access this resource 😢😢😢😢"
+                })
+
+            }
+
+            next();
+        } catch (error) {
+            res.status(500).json({
+                message: "internal server error🥲🥲🥲🥲",
+                error: error
+            })
+
+        }
+    }
+}
