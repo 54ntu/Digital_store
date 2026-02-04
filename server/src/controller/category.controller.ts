@@ -118,6 +118,44 @@ class CategoryController {
 
     }
 
+    static async deleteCategory(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.params;
+
+            //first check whether category with given id exists or not
+            const existingCategory = await Category.findAll({
+                where: {
+                    id: id
+                }
+            })
+
+            if (existingCategory.length === 0) {
+                res.status(404).json({
+                    message: "Category not found"
+                })
+                return;
+            }
+
+            //if found then delete the category
+            await Category.destroy({
+                where: {
+                    id: id
+                }
+            })
+
+            res.status(200).json({
+                message: "Category deleted successfully!!!!!!!!!!!!!!!!!!!"
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "internal server error",
+                error: error
+            })
+
+        }
+    }
+
+
 
 }
 
