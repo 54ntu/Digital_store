@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { Category } from "../models/category.model.js";
+import { ApiError } from "../handler/ApiError.js";
 
 class CategoryController {
     // Controller methods will be implemented here
@@ -74,7 +75,6 @@ class CategoryController {
     static async updateCategory(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            console.log("id getting is : ", id)
             const { categoryName } = req.body;
             if (!id || !categoryName) {
                 res.status(400).json({
@@ -83,7 +83,6 @@ class CategoryController {
                 return;
             }
 
-            console.log("yeta hit vaye hoiii")
             //check whether the category of given id exists or not
             const existingCategory = await Category.findAll({
                 where: {
@@ -92,7 +91,6 @@ class CategoryController {
             })
 
 
-            console.log(`existingCategory : ${existingCategory}`)
 
             if (existingCategory.length === 0) {
                 res.status(404).json({
@@ -112,16 +110,15 @@ class CategoryController {
             })
 
 
+
             res.status(200).json({
                 message: "category updated successfully",
                 updatedCategory: updatedCategory
             })
         } catch (error) {
-            res.status(500).json({
-                message: "internal server error",
-                error: error
-            })
-            return;
+
+            throw new ApiError(500, "Internal server error")
+
 
         }
 
