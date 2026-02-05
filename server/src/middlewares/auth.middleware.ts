@@ -19,7 +19,11 @@ interface IextededRequest extends Request {
 
 class UserMiddleware {
     static async isUserLoggedIn(req: IextededRequest, res: Response, next: NextFunction): Promise<void> {
+
+        console.log("middleware hit vayo hoiii")
         try {
+
+
             const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
             if (!token) {
                 res.status(401).json({
@@ -63,6 +67,8 @@ class UserMiddleware {
 
     static async isAdmin(req: IextededRequest, res: Response, next: NextFunction): Promise<void> {
 
+        // console.log("req.user value is : ", req.user)
+
         try {
             if (!req.user) {
                 res.status(401).json({
@@ -87,3 +93,5 @@ class UserMiddleware {
         }
     }
 }
+
+export default UserMiddleware;

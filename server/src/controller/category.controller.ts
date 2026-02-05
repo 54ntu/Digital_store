@@ -4,9 +4,13 @@ import { Category } from "../models/category.model.js";
 class CategoryController {
     // Controller methods will be implemented here
     static async addCategory(req: Request, res: Response) {
+
         try {
+
+            console.log(req.body)
             // Implementation for adding a category
             const { categoryName } = req.body;
+
 
             if (!categoryName) {
                 return res.status(400).json({ message: "Category name is required" });
@@ -26,6 +30,7 @@ class CategoryController {
             const newCategory = await Category.create({
                 categoryName: categoryName
             })
+
 
             if (!newCategory) {
                 return res.status(500).json({ message: "Failed to create category" });
@@ -69,6 +74,7 @@ class CategoryController {
     static async updateCategory(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
+            console.log("id getting is : ", id)
             const { categoryName } = req.body;
             if (!id || !categoryName) {
                 res.status(400).json({
@@ -77,12 +83,16 @@ class CategoryController {
                 return;
             }
 
+            console.log("yeta hit vaye hoiii")
             //check whether the category of given id exists or not
             const existingCategory = await Category.findAll({
                 where: {
                     id: id
                 }
             })
+
+
+            console.log(`existingCategory : ${existingCategory}`)
 
             if (existingCategory.length === 0) {
                 res.status(404).json({

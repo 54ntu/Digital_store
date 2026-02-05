@@ -9,7 +9,7 @@ class ProductController {
 
         //image url will be handled separately
         const productImageUrl = req.file ?.filename;
-        console.log(req.file)
+        // console.log(req.file)
     }
 
 }
