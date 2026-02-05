@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript"
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript"
+import { Category } from "./category.model.js"
 
 @Table({
     tableName: "products",
@@ -18,6 +19,7 @@ export class Product extends Model {
     @Column({
         type: DataType.STRING,
         allowNull: false,
+        unique: true
 
     })
     declare productName: string
@@ -53,5 +55,20 @@ export class Product extends Model {
 
     })
     declare discount: number
+
+
+    //this set categoryID
+    @ForeignKey(() => Category)
+    @Column({
+        type: DataType.UUID,
+        allowNull: false
+    })
+
+    declare categoryId: string
+
+
+    //relation
+    @BelongsTo(() => Category)
+    declare category: Category
 
 }

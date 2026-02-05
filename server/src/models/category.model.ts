@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript"
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript"
+import { Product } from "./product.model.js"
 
 @Table({
     tableName: "categories",
@@ -22,4 +23,7 @@ export class Category extends Model {
         unique: true,
     })
     declare categoryName: string
+
+    @HasMany(() => Product)
+    declare products: Product[];
 }

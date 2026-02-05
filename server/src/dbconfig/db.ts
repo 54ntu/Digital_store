@@ -25,4 +25,6 @@ sequelize.sync({ force: false, alter: true }).then(() => {    //this will create
   console.log("all models synced successfully");
 })
 
+
+
 export { sequelize };
