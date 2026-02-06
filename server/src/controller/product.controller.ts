@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { Product } from "../models/product.model.js";
+import { emitWarning } from "node:process";
 
 class ProductController {
     // Controller methods will be implemented here
@@ -66,6 +67,32 @@ class ProductController {
         } catch (error) {
             res.status(500).json({
                 message: "Internal server error😒😒😒😒",
+                error
+            })
+
+        }
+
+    }
+
+    static async getProduct(req: Request, res: Response): Promise<void> {
+        try {
+            const products = await Product.findAll();
+            if (products.length === 0) {
+                res.status(404).json({
+                    message: "product not found😒😒😒😒😒😒"
+                })
+                return;
+            }
+
+            res.status(200).json({
+                message: "product data fetched successfully😊😊😊😊😊😊",
+                product: products
+            })
+            return;
+
+        } catch (error) {
+            res.status(500).json({
+                message: "error while fetching product data🥲🥲🥲🥲🥲🥲🥲",
                 error
             })
 
