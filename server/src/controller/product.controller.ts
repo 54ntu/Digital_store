@@ -100,6 +100,106 @@ class ProductController {
 
     }
 
+    static async updateProduct(req: Request, res: Response): Promise<void> {
+        try {
+            const { productId } = req.params
+
+            const { productName, description, price, productStock, discount } = req.body
+
+            const productImageUrl = req.file?.filename;
+
+            //check whether the product with the given id exist or not
+            const isProductExist = await Product.findOne({
+                where: { id: productId }
+            })
+
+            if (!isProductExist) {
+                res.status(404).json({
+                    message: "product with the given id doesnot exists"
+                })
+                return;
+            }
+
+            //if exist then just update the products
+
+            await isProductExist.update({
+                productName,
+                description,
+                price,
+                discount,
+                productImageUrl
+
+            })
+
+            res.status(201).json({
+                message: "product updated successfully🤩🤩🤩🤩🤩🤩",
+                isProductExist
+            })
+            return;
+
+        } catch (error) {
+
+            res.status(500).json({
+                message: "error while updating the product🥲🥲🥲🥲🥲",
+                error
+            })
+
+        }
+    }
+
+    static async updateProductStock(req: Request, res: Response): Promise<void> {
+        try {
+            const { productId } = req.params;
+            const { quantity } = req.body;
+
+
+            if (!quantity || isNaN(quantity)) {
+                res.status(400).json({
+                    message: "Quantity must be a number"
+                })
+                return
+            }
+
+            const product = await Product.findOne({
+                where: {
+                    id: productId
+                }
+            })
+
+            if (!product) {
+                res.status(404).json({
+                    message: "product not found"
+                })
+                return;
+            }
+
+            const newStock = product.productStock + Number(quantity);
+
+            if (newStock < 0) {
+                res.status(400).json({
+                    message: "Insufficient stock"
+                })
+                return;
+            }
+
+            product.productStock = newStock;
+            await product.save()
+
+            res.status(200).json({
+                message: "product stock updated successfully😊😊😊😊😊",
+                product
+
+            })
+
+        } catch (error) {
+            res.status(500).json({
+                message: "error while updating the stock",
+                error
+            })
+
+        }
+    }
+
 }
 
 
