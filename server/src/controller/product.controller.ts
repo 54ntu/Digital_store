@@ -6,32 +6,70 @@ class ProductController {
 
     static async createProduct(req: Request, res: Response): Promise<void> {
 
-        // Implementation for creating a product
-        const { productName, description, price, productStock, discount, categoryID } = req.body;
+        try {
+            // Implementation for creating a product
+            const { productName, description, price, productStock, discount, categoryId } = req.body;
 
-        if (!productName || !description || !price || !productStock || !categoryID) {
-            res.status(500).json({
-                message: "All fields are required😡😡😡😡😡😡😡"
-            })
-        }
-
-        //image url will be handled separately  
-        const productImageUrl = req.file?.filename;
-        // console.log(productImageUrl)
-
-        if (!productImageUrl) {
-            res.send(500).json({
-                message: "image name is not received🤬🤬🤬🤬🤬🤬🤬🤬🤬"
-            })
-        }
-
-        //check whether the same category and same product exist already or not
-        const isProductExist= await Product.findAll({
-            where:{
-                productName,
-                
+            if (!productName || !description || !price || !productStock || !categoryId) {
+                res.status(500).json({
+                    message: "All fields are required😡😡😡😡😡😡😡"
+                })
             }
-        })
+
+            //image url will be handled separately  
+            const productImageUrl = req.file?.filename;
+            // console.log(productImageUrl)
+
+            if (!productImageUrl) {
+                res.send(500).json({
+                    message: "image name is not received🤬🤬🤬🤬🤬🤬🤬🤬🤬"
+                })
+            }
+
+            //check whether the same category and same product exist already or not
+            const isProductExist = await Product.findOne({
+                where: {
+                    productName,
+                    categoryId
+
+                }
+            })
+
+            if (isProductExist) {
+                isProductExist.productStock += Number(productStock)
+                await isProductExist.save();
+
+                res.status(200).json({
+                    message: "product stock increamented successfully!!!",
+                    product: isProductExist
+                })
+                return;
+            }
+
+            //if not new product is existed then we have to create new product
+
+            const newProduct = await Product.create({
+
+                productName,
+                description,
+                price,
+                productStock,
+                productImageUrl,
+                discount,
+                categoryId
+            })
+
+            res.status(201).json({
+                message: "new product created successfully😊😊😊😊😊😊🤩🤩",
+                product: newProduct
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal server error😒😒😒😒",
+                error
+            })
+
+        }
 
     }
 
