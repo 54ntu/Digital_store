@@ -237,6 +237,51 @@ class ProductController {
         }
     }
 
+    static async deleteProduct(req: Request, res: Response): Promise<void> {
+
+        try {
+            const { id } = req.params
+
+            //validate the id is number or not
+            if (!id || Array.isArray(id)) {
+                res.status(400).json({
+                    message: "invalid product id"
+                })
+                return;
+            }
+
+            const datas = await Product.findAll({
+                where: {
+                    id: id
+                }
+            })
+
+            if (datas.length === 0) {
+                res.status(404).json({
+                    message: "product data not found😒😒😒😒😒"
+                })
+                return;
+            }
+
+            await Product.destroy({
+                where: {
+                    id: id
+                }
+            })
+
+            res.status(200).json({
+                message: "product deleted successfully😎😎😎😎😎"
+            })
+            return;
+        } catch (error) {
+            res.status(500).json({
+                message: "error while deleting product",
+                error
+            })
+
+        }
+    }
+
 }
 
 
