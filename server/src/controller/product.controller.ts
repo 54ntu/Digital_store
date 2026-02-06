@@ -200,6 +200,43 @@ class ProductController {
         }
     }
 
+    static async getSingleProduct(req: Request, res: Response): Promise<void> {
+        try {
+            const { id: productId } = req.params;
+
+            if (!productId || Array.isArray(productId)) {
+                res.status(400).json({
+                    message: "Invalid product ID"
+                })
+                return;
+            }
+
+            //find the product with the given id
+            const product = await Product.findByPk(productId, {
+                include: ["category"]
+            })
+
+            if (!product) {
+                res.status(404).json({
+                    message: "product with the given ID doesnot exists"
+                })
+                return;
+            }
+
+            res.status(200).json({
+                message: "product data is fetched successfully😎😎😎😎😎",
+                product
+            })
+            return;
+        } catch (error) {
+            res.status(500).json({
+                message: "error while fetching single product🥲🥲🥲🥲",
+                error
+            })
+
+        }
+    }
+
 }
 
 
