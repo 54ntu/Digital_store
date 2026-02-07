@@ -7,279 +7,240 @@ class ProductController {
 
     static async createProduct(req: Request, res: Response): Promise<void> {
 
-        try {
-            // Implementation for creating a product
-            const { productName, description, price, productStock, discount, categoryId } = req.body;
 
-            if (!productName || !description || !price || !productStock || !categoryId) {
-                res.status(500).json({
-                    message: "All fields are required😡😡😡😡😡😡😡"
-                })
-            }
+        // Implementation for creating a product
+        const { productName, description, price, productStock, discount, categoryId } = req.body;
 
-            //image url will be handled separately  
-            const productImageUrl = req.file?.filename;
-            // console.log(productImageUrl)
-
-            if (!productImageUrl) {
-                res.send(500).json({
-                    message: "image name is not received🤬🤬🤬🤬🤬🤬🤬🤬🤬"
-                })
-            }
-
-            //check whether the same category and same product exist already or not
-            const isProductExist = await Product.findOne({
-                where: {
-                    productName,
-                    categoryId
-
-                }
-            })
-
-            if (isProductExist) {
-                isProductExist.productStock += Number(productStock)
-                await isProductExist.save();
-
-                res.status(200).json({
-                    message: "product stock increamented successfully!!!",
-                    product: isProductExist
-                })
-                return;
-            }
-
-            //if not new product is existed then we have to create new product
-
-            const newProduct = await Product.create({
-
-                productName,
-                description,
-                price,
-                productStock,
-                productImageUrl,
-                discount,
-                categoryId
-            })
-
-            res.status(201).json({
-                message: "new product created successfully😊😊😊😊😊😊🤩🤩",
-                product: newProduct
-            })
-        } catch (error) {
+        if (!productName || !description || !price || !productStock || !categoryId) {
             res.status(500).json({
-                message: "Internal server error😒😒😒😒",
-                error
+                message: "All fields are required😡😡😡😡😡😡😡"
             })
-
         }
+
+        //image url will be handled separately  
+        const productImageUrl = req.file?.filename;
+        // console.log(productImageUrl)
+
+        if (!productImageUrl) {
+            res.send(500).json({
+                message: "image name is not received🤬🤬🤬🤬🤬🤬🤬🤬🤬"
+            })
+        }
+
+        //check whether the same category and same product exist already or not
+        const isProductExist = await Product.findOne({
+            where: {
+                productName,
+                categoryId
+
+            }
+        })
+
+        if (isProductExist) {
+            isProductExist.productStock += Number(productStock)
+            await isProductExist.save();
+
+            res.status(200).json({
+                message: "product stock increamented successfully!!!",
+                product: isProductExist
+            })
+            return;
+        }
+
+        //if not new product is existed then we have to create new product
+
+        const newProduct = await Product.create({
+
+            productName,
+            description,
+            price,
+            productStock,
+            productImageUrl,
+            discount,
+            categoryId
+        })
+
+        res.status(201).json({
+            message: "new product created successfully😊😊😊😊😊😊🤩🤩",
+            product: newProduct
+        })
+
 
     }
 
     static async getProduct(req: Request, res: Response): Promise<void> {
-        try {
-            const products = await Product.findAll();
-            if (products.length === 0) {
-                res.status(404).json({
-                    message: "product not found😒😒😒😒😒😒"
-                })
-                return;
-            }
 
-            res.status(200).json({
-                message: "product data fetched successfully😊😊😊😊😊😊",
-                product: products
+        const products = await Product.findAll();
+        if (products.length === 0) {
+            res.status(404).json({
+                message: "product not found😒😒😒😒😒😒"
             })
             return;
-
-        } catch (error) {
-            res.status(500).json({
-                message: "error while fetching product data🥲🥲🥲🥲🥲🥲🥲",
-                error
-            })
-
         }
+
+        res.status(200).json({
+            message: "product data fetched successfully😊😊😊😊😊😊",
+            product: products
+        })
+        return;
 
     }
 
     static async updateProduct(req: Request, res: Response): Promise<void> {
-        try {
-            const { productId } = req.params
 
-            const { productName, description, price, productStock, discount } = req.body
+        const { productId } = req.params
 
-            const productImageUrl = req.file?.filename;
+        const { productName, description, price, productStock, discount } = req.body
 
-            //check whether the product with the given id exist or not
-            const isProductExist = await Product.findOne({
-                where: { id: productId }
-            })
+        const productImageUrl = req.file?.filename;
 
-            if (!isProductExist) {
-                res.status(404).json({
-                    message: "product with the given id doesnot exists"
-                })
-                return;
-            }
+        //check whether the product with the given id exist or not
+        const isProductExist = await Product.findOne({
+            where: { id: productId }
+        })
 
-            //if exist then just update the products
-
-            await isProductExist.update({
-                productName,
-                description,
-                price,
-                discount,
-                productImageUrl
-
-            })
-
-            res.status(201).json({
-                message: "product updated successfully🤩🤩🤩🤩🤩🤩",
-                isProductExist
+        if (!isProductExist) {
+            res.status(404).json({
+                message: "product with the given id doesnot exists"
             })
             return;
-
-        } catch (error) {
-
-            res.status(500).json({
-                message: "error while updating the product🥲🥲🥲🥲🥲",
-                error
-            })
-
         }
+
+        //if exist then just update the products
+
+        await isProductExist.update({
+            productName,
+            description,
+            price,
+            discount,
+            productImageUrl
+
+        })
+
+        res.status(201).json({
+            message: "product updated successfully🤩🤩🤩🤩🤩🤩",
+            isProductExist
+        })
+        return;
+
     }
 
+
     static async updateProductStock(req: Request, res: Response): Promise<void> {
-        try {
-            const { productId } = req.params;
-            const { quantity } = req.body;
+
+        const { productId } = req.params;
+        const { quantity } = req.body;
 
 
-            if (!quantity || isNaN(quantity)) {
-                res.status(400).json({
-                    message: "Quantity must be a number"
-                })
-                return
-            }
-
-            const product = await Product.findOne({
-                where: {
-                    id: productId
-                }
+        if (!quantity || isNaN(quantity)) {
+            res.status(400).json({
+                message: "Quantity must be a number"
             })
-
-            if (!product) {
-                res.status(404).json({
-                    message: "product not found"
-                })
-                return;
-            }
-
-            const newStock = product.productStock + Number(quantity);
-
-            if (newStock < 0) {
-                res.status(400).json({
-                    message: "Insufficient stock"
-                })
-                return;
-            }
-
-            product.productStock = newStock;
-            await product.save()
-
-            res.status(200).json({
-                message: "product stock updated successfully😊😊😊😊😊",
-                product
-
-            })
-
-        } catch (error) {
-            res.status(500).json({
-                message: "error while updating the stock",
-                error
-            })
-
+            return
         }
+
+        const product = await Product.findOne({
+            where: {
+                id: productId
+            }
+        })
+
+        if (!product) {
+            res.status(404).json({
+                message: "product not found"
+            })
+            return;
+        }
+
+        const newStock = product.productStock + Number(quantity);
+
+        if (newStock < 0) {
+            res.status(400).json({
+                message: "Insufficient stock"
+            })
+            return;
+        }
+
+        product.productStock = newStock;
+        await product.save()
+
+        res.status(200).json({
+            message: "product stock updated successfully😊😊😊😊😊",
+            product
+
+        })
+
+
     }
 
     static async getSingleProduct(req: Request, res: Response): Promise<void> {
-        try {
-            const { id: productId } = req.params;
 
-            if (!productId || Array.isArray(productId)) {
-                res.status(400).json({
-                    message: "Invalid product ID"
-                })
-                return;
-            }
+        const { id: productId } = req.params;
 
-            //find the product with the given id
-            const product = await Product.findByPk(productId, {
-                include: ["category"]
-            })
-
-            if (!product) {
-                res.status(404).json({
-                    message: "product with the given ID doesnot exists"
-                })
-                return;
-            }
-
-            res.status(200).json({
-                message: "product data is fetched successfully😎😎😎😎😎",
-                product
+        if (!productId || Array.isArray(productId)) {
+            res.status(400).json({
+                message: "Invalid product ID"
             })
             return;
-        } catch (error) {
-            res.status(500).json({
-                message: "error while fetching single product🥲🥲🥲🥲",
-                error
-            })
-
         }
+
+        //find the product with the given id
+        const product = await Product.findByPk(productId, {
+            include: ["category"]
+        })
+
+        if (!product) {
+            res.status(404).json({
+                message: "product with the given ID doesnot exists"
+            })
+            return;
+        }
+
+        res.status(200).json({
+            message: "product data is fetched successfully😎😎😎😎😎",
+            product
+        })
+        return;
+
     }
 
     static async deleteProduct(req: Request, res: Response): Promise<void> {
 
-        try {
-            const { id } = req.params
 
-            //validate the id is number or not
-            if (!id || Array.isArray(id)) {
-                res.status(400).json({
-                    message: "invalid product id"
-                })
-                return;
-            }
+        const { id } = req.params
 
-            const datas = await Product.findAll({
-                where: {
-                    id: id
-                }
-            })
-
-            if (datas.length === 0) {
-                res.status(404).json({
-                    message: "product data not found😒😒😒😒😒"
-                })
-                return;
-            }
-
-            await Product.destroy({
-                where: {
-                    id: id
-                }
-            })
-
-            res.status(200).json({
-                message: "product deleted successfully😎😎😎😎😎"
+        //validate the id is number or not
+        if (!id || Array.isArray(id)) {
+            res.status(400).json({
+                message: "invalid product id"
             })
             return;
-        } catch (error) {
-            res.status(500).json({
-                message: "error while deleting product",
-                error
-            })
-
         }
+
+        const datas = await Product.findAll({
+            where: {
+                id: id
+            }
+        })
+
+        if (datas.length === 0) {
+            res.status(404).json({
+                message: "product data not found😒😒😒😒😒"
+            })
+            return;
+        }
+
+        await Product.destroy({
+            where: {
+                id: id
+            }
+        })
+
+        res.status(200).json({
+            message: "product deleted successfully😎😎😎😎😎"
+        })
+        return;
+
     }
 
 }

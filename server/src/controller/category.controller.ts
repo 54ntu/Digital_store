@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { Category } from "../models/category.model.js";
-import { ApiError } from "../handler/ApiError.js";
+import { ApiError } from "../handler/errorHandler.js";
 
 class CategoryController {
     // Controller methods will be implemented here
