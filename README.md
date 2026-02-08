@@ -21,11 +21,11 @@ They will be provided with the different payment options. When the order is plac
 ```javascript
 
 git@github.com:54ntu/Digital_store.git
-cd backend
+cd server
 cd frontend
 npm install //to install all the node_modules
 npm run dev for frontend
-npm start for backend
+npm run dev for backend
 
 ```
 
