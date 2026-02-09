@@ -1,4 +1,4 @@
-import { Table, Column, DataType, Model, PrimaryKey, AllowNull } from "sequelize-typescript"
+import { Table, Column, DataType, Model, AllowNull } from "sequelize-typescript"
 import { OrderStatus } from "../globals/types/index.js";
 
 @Table({
@@ -54,7 +54,7 @@ class Order extends Model {
         defaultValue: OrderStatus.Pending
 
     })
-    declare orderStatus: string
+    declare orderStatus: string 
 
 
 
