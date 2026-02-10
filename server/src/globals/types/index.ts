@@ -5,3 +5,14 @@ export enum OrderStatus {
     Cancelled = "cancelled"
 }
 
+
+export enum PaymentMethod {
+    khalti = "khalti",
+    card = "Card",
+    COD = "cod"
+}
+
+export enum paymentStatus {
+    Paid = "paid",
+    Unpaid = "Unpaid"
+}
