@@ -76,4 +76,17 @@ class CartController {
             data: cartItems
         })
     }
+
+    static async deleteMyCartItem(req: userRequest, res: Request): Promise<void> {
+        const userId = req.user?.id
+        const { productId } = req.params
+        //check if item exist or not 
+        const productExist = await Product.findOne({
+            where: {
+                productId
+            }
+        })
+
+       
+    }
 }
