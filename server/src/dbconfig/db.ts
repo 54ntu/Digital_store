@@ -7,6 +7,7 @@ import { Category } from "../models/category.model.js";
 import Order from "../models/ordermodel.js";
 import { OrderDetail } from "../models/orderDetails.model.js";
 import Payment from "../models/payment.model.js";
+import Cart from "../models/cart.models.js";
 
 // const sequelize = new Sequelize(
 //   envConfig.postgresUri as string,
@@ -18,7 +19,7 @@ import Payment from "../models/payment.model.js";
 
 
 const sequelize = new Sequelize(envConfig.postgresUri as string, {
-  models: [User, PasswordResetSession, Product, Category, Order, OrderDetail, Payment]    //this will automatically import all models defined in the models folder
+  models: [User, PasswordResetSession, Product, Category, Order, OrderDetail, Payment, Cart]    //this will automatically import all models defined in the models folder
 })
 
 
@@ -42,6 +43,15 @@ Product.hasMany(OrderDetail)
 //relation between payment and order
 Payment.belongsTo(Order)
 Order.hasOne(Payment)
+
+//relation between Cart, userId and productId
+Cart.belongsTo(User),
+  User.hasOne(Cart)
+
+
+Product.belongsTo(Cart)
+Cart.hasMany(Product)
+
 
 
 export { sequelize };
