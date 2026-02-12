@@ -49,8 +49,8 @@ Cart.belongsTo(User),
   User.hasOne(Cart)
 
 
-Product.belongsTo(Cart)
-Cart.hasMany(Product)
+Cart.belongsTo(Product)
+Product.hasMany(Cart)
 
 
 
