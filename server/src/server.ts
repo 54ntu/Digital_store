@@ -6,6 +6,7 @@ import adminSeeder from "./adminSeeder.js";
 import { Server } from "socket.io"
 import jwt from "jsonwebtoken";
 import User from "./models/user.model.js";
+import Order from "./models/ordermodel.js";
 
 
 
@@ -53,7 +54,30 @@ try {
 
                 })
 
+            } else {
+                socket.emit("error", "invalid token")
             }
+
+            socket.on("updateOrderStatus", async (data) => {
+                const { status, orderId, userId } = data
+                const isUserExist = onlineUsers.find((user) => user.userId == userId)
+                //update the orderstatus based on the data received
+                await Order.update(
+                    {
+                        orderStatus: status
+                    }, {
+                    where: {
+                        id: orderId
+                    }
+                }
+                )
+                if (isUserExist) {
+                    io.to(isUserExist.socketId).emit("success", "order status has been updated successfully")
+
+                } else {
+                    socket.emit("error", "user is not online")
+                }
+            })
 
         })
 
