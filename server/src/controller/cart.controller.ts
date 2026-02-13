@@ -77,7 +77,7 @@ class CartController {
         })
     }
 
-    static async deleteMyCartItem(req: userRequest, res: Request): Promise<void> {
+    static async deleteMyCartItem(req: userRequest, res: Response): Promise<void> {
         const userId = req.user?.id
         const { productId } = req.params
         //check if item exist or not 
@@ -87,6 +87,65 @@ class CartController {
             }
         })
 
-       
+        if (!productExist) {
+            res.status(404).json({
+                message: "product with the given product id doesnot exist on the cart"
+
+            })
+        }
+
+        await Cart.destroy({
+            where: {
+                productId,
+                userId
+            }
+        })
+
+        res.status(200).json({
+            message: "cart deleted successfully..."
+
+        })
+        return;
+
+
+    }
+
+    static async updateCartItemQuantiy(req: userRequest, res: Response): Promise<void> {
+        const userId = req.user?.id;
+        const { productId } = req.params
+        const { quantity } = req.body
+        if (!quantity) {
+            res.status(400).json({
+                message: "quantity is required!!!!!!"
+            })
+        }
+
+        const cartItem = await Cart.findOne({
+            where: {
+                productId,
+                userId
+            }
+        })
+
+        if (!cartItem) {
+            res.status(404).json({
+                message: "product with the given Id does not exist in the cart"
+            })
+            return;
+        }
+
+        cartItem.quantity = quantity
+        await cartItem.save();
+
+        res.status(200).json({
+            message: "quantity of the product is updated in the cart!!!!!!!!"
+        })
+        return;
+
+
+
     }
 }
+
+
+export default CartController;
